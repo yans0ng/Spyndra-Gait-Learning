@@ -1,6 +1,19 @@
 # Spyndra-Gait-Learning
 This project aims at generating walking locomotion of legged robot autonomously. The training data were generated on the open-source robotic platform [Spyndra](http://www.creativemachineslab.com/spyndra.html).
 
+## Content
+
+* data: recored on real robot. Suggested structure:
+```
+   - data
+      - date
+         - gait type
+            - data type
+```
+* preprocessing: jupyter notebooks explains each step clearly.
+* ml: actual machine learning implementation (keras and sklearn)
+* simulation: comparison between real measurement and simulation
+
 ## Dependencies
 * python 2.7
 * tensorflow
