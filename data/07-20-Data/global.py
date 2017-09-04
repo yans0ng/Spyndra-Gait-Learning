@@ -25,27 +25,62 @@ y = np.vstack( (y_dist, y_dir, y_orient) ).T
 features = ['f1', 'f2', 'f3', 'f4', 't1', 't2', 't3', 't4']
 X = data[ features ].as_matrix()
 
-# Separate training and testing dataset
-X_train = X[:18]
-X_test = X[18:]
-y_train = y[:18]
-y_test = y[18:]
+# Shuffle samples
+shuffle = np.random.choice( len(y), len(y), replace=False )
 
+# Separate training and testing dataset
+X_train = X[shuffle[:18]]
+X_test = X[shuffle[18:]]
+y_train = y[shuffle[:18]]
+y_test = y[shuffle[18:]]
+
+# Define Error Metric
+def accuracy( y_true, y_pred):
+    # Cosine rule
+    xt = y_true[:,0] * np.cos( y_true[:,1] )
+    yt = y_true[:,0] * np.sin( y_true[:,1] )
+    xp = y_pred[:,0] * np.cos( y_pred[:,1] )
+    yp = y_pred[:,0] * np.sin( y_pred[:,1] )
+    diff = np.sqrt( (xt-xp)**2 + (yt-yp)**2 ) # / y_true[:,0]
+    return np.mean(diff)
+
+def score( y_true, y_pred):
+    print("\t - Distance MSE: %.2f"% mean_squared_error(y_true[:,0], y_pred[:,0]))
+    print("\t - Direction MSE: %.2f"% mean_squared_error(y_true[:,1], y_pred[:,1]))
+    print("\t - Orientation MSE: %.6f"% mean_squared_error(y_true[:,2], y_pred[:,2]))
+    print("\t - Accuracy: %2f"%accuracy(y_true, y_pred))
+
+# Linear regressor
 regr = linear_model.LinearRegression()
 regr.fit(X_train, y_train )
 
-y_pred = regr.predict(X_test)
+y_valid_lr = regr.predict(X_train)  # Training error
+y_pred_lr = regr.predict(X_test)    # Testing error
 
-print("Mean squared error: %.2f"% mean_squared_error(y_test, y_pred))
-# Explained variance score: 1 is perfect prediction
-print('Variance score: %.2f' % r2_score(y_test, y_pred))
+print("Linear Regression")
+print("\tTraining")
+score(y_train, y_valid_lr)
+print("\tTesting")
+score(y_test, y_pred_lr)
 
-def visualize(ax, labels, prefix, color):
-    l = 2
-    w = 0.1
+# Ridge regression
+ridge = linear_model.Ridge(alpha=0.5)
+ridge.fit(X_train, y_train)
 
+y_valid_rr = ridge.predict(X_train)
+y_pred_rr = ridge.predict(X_test)
+
+print("Ridge Regression")
+print("\tTraining")
+score(y_train, y_valid_rr)
+print("\tTesting")
+score(y_test, y_pred_rr)
+
+def visualize(ax, labels, colorname):
+    l = 4   # arrow length
+    w = 0.1 # arrow width
+    # Plot arrows
     for i, label in enumerate(labels):
-        print label
         pos_x = label[0]*np.cos(label[1])
         pos_y = label[0]*np.sin(label[1])
         ax.add_patch( patches.Arrow( pos_x, 
@@ -53,11 +88,17 @@ def visualize(ax, labels, prefix, color):
                                      l*np.cos( label[2]), 
                                      l*np.sin( label[2]), 
                                      width = 2, 
-                                     facecolor=color))
-        ax.text( pos_x, pos_y+1, prefix + str(i) )
+                                     facecolor=colorname))
+        ax.text( pos_x-1, pos_y+1, str(i), color=colorname)
 
+# Visualize prediction
 fig, ax = plt.subplots(1,1)
-visualize(ax, y_test, 'test ', "red")
-visualize(ax, y_pred, "pred ", "blue")
+visualize(ax, y_test, "red")
+visualize(ax, y_pred_lr, "blue")
+visualize(ax, y_pred_rr, "green")
+ax.grid()
+ax.set_xlabel('cm')
+ax.set_ylabel('cm')
+ax.axis('equal')
 ax.autoscale()
 plt.show()
