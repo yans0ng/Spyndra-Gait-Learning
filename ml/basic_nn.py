@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from util import *
 # load dataset
-filepaths = getfiles('data/07-20-Data/normalized/*.csv')
+filepaths = getfiles('../data/07-20-Data/normalized/*.csv')
 print 'Glob {} files'.format(len(filepaths))
 
 # the 15th only have 105 rows
@@ -46,9 +46,9 @@ X_viz, y_viz = getdata(filepaths[18])  #testing the 19th for visualization
 y_viz = y_viz[:,2]
 
 #TODO test
-X_train = X_train.reshape((1,5400,22))
-y_train = y_train.reshape((5400,1))
-print X_train.shape
+#X_train = X_train.reshape((1,5400,22))
+#y_train = y_train.reshape((5400,1))
+##print X_train.shape
 print y_train.shape
 
 # fix the random seed for consistency
@@ -76,68 +76,47 @@ print("Saved model to disk")
 '''
 
 # deeper network
-# define the model
-#def larger_model():
-#        # create model
-#        model = Sequential()
-#        #model.add(Dense(14, input_dim=14, kernel_initializer='normal', activation='relu'))
-#        #model.add(Dense(8, kernel_initializer='normal', activation='relu'))
-#        #model.add(Dense(4, kernel_initializer='normal', activation='relu'))
-#        #model.add(Dense(2, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(1, kernel_initializer='normal'))
+def deeper_model():
+    # create model
+    model = Sequential()
+    model.add(Dense(22, input_dim=22, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(8, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(4, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(2, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(1, kernel_initializer='normal'))
 
-#        model.add(Dense(22, input_dim=22, kernel_initializer='normal', activation='relu'))
-#        #model.add(Dense(14, kernel_initializer='normal', activation='relu'))
-#        model.add(Dense(8, kernel_initializer='normal', activation='relu'))
-#        model.add(Dense(4, kernel_initializer='normal', activation='relu'))
-#        model.add(Dense(2, kernel_initializer='normal', activation='relu'))
-#        model.add(Dense(1, kernel_initializer='normal'))
+    # Optimizer
+    sgd = optimizers.SGD(lr = 0.005, clipnorm = 1.)
 
-        # Optimizer
-#        sgd = optimizers.SGD(lr = 0.005, clipnorm = 1.)
-
-        # Compile model
-#        model.compile(loss='mean_squared_error', optimizer=sgd)
-#        return model
+    # Compile model
+    model.compile(loss='mean_squared_error', optimizer=sgd)
+    return model
 
 # define the model
 def larger_model():
-        # create model
-        model = Sequential()
-        #model.add(Dense(14, input_dim=14, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(8, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(4, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(2, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(1, kernel_initializer='normal'))
+    # create model
+    model = Sequential()
+    model.add(LSTM(22, input_dim=22, input_length=5400,return_sequences=True))
+    model.add(LSTM(22, return_sequences=True))
+    model.add(LSTM(14, return_sequences=True))
+    model.add(LSTM(1, return_sequences=False))
 
-        model.add(LSTM(22, input_dim=22, input_length=5400,return_sequences=True))
-        model.add(LSTM(22, return_sequences=True))
-        model.add(LSTM(14, return_sequences=True))
-        model.add(LSTM(1, return_sequences=False))
-        #model.add(Dense(22, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(14, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(8, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(4, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(2, kernel_initializer='normal', activation='relu'))
-        #model.add(Dense(1, kernel_initializer='normal'))
+    # Optimizer
+    sgd = optimizers.SGD(lr = 0.005, clipnorm = 1.)
 
-        # Optimizer
-        sgd = optimizers.SGD(lr = 0.005, clipnorm = 1.)
-
-        # Compile model
-        model.compile(loss='mean_squared_error', optimizer=sgd)
-        return model
-
+    # Compile model
+    model.compile(loss='mean_squared_error', optimizer=sgd)
+    return model
 
 print "Deeper NN:"
-deeper = larger_model()
+deeper = deeper_model()
 deeper.fit(X_train,y_train, epochs=500,batch_size=10, validation_split=0.3, shuffle= True)
-deeper.save_weights("deep_model.h5")
+deeper.save_weights("models/deep_model.h5")
 print("Saved model to disk")
 
 # serialize model to JSON
 model_json = deeper.to_json()
-with open("model.json", "w") as json_file:
+with open("models/model.json", "w") as json_file:
     json_file.write(model_json)
 
 import keras.backend as K
@@ -148,11 +127,11 @@ def my_mse(y_true, y_pred):
 
 from keras.models import model_from_json
 # load json and create model
-json_file = open('model.json', 'r')
+json_file = open('models/model.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 loaded_model = model_from_json(loaded_model_json)
-loaded_model.load_weights("deep_model.h5")
+loaded_model.load_weights("models/deep_model.h5")
 print("Loaded model from disk")
  
 # evaluate loaded model on test data
@@ -166,5 +145,5 @@ y_pred = loaded_model.predict(X_viz)
 plt.plot(y_pred, 'r',label='prediction')
 plt.plot(y_viz, 'b',label='ground truth')
 plt.legend()
-plt.savefig('pred.png')
+plt.savefig('images/pred.png')
 plt.show()
