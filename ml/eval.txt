@@ -1,3 +1,40 @@
+========================================
+testing
+========================================
+0yaw500
+avg. mean squared error: 1.0115
+avg. mean absolute error: 0.8694
+avg. correlation coefficient: nan
+
+1yaw500
+avg. mean squared error: 0.4334
+avg. mean absolute error: 0.4991
+avg. correlation coefficient: 0.8088
+
+
+2yaw500
+avg. mean squared error: 0.5533
+avg. mean absolute error: 0.5652
+avg. correlation coefficient: 0.7641
+
+2yaw800
+avg. mean squared error: 0.2691
+avg. mean absolute error: 0.3795
+avg. correlation coefficient: 0.8863
+
+3yaw500
+avg. mean squared error: 0.6682
+avg. mean absolute error: 0.6031
+avg. correlation coefficient: 0.6880
+
+3yaw800
+avg. mean squared error: 0.3384
+avg. mean absolute error: 0.4089
+avg. correlation coefficient: 0.8310
+
+========================================
+training
+========================================
 0yaw500
 avg. mean squared error: 1.0538
 avg. mean absolute error: 0.8891

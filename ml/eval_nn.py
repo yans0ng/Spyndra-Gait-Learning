@@ -13,8 +13,8 @@ if __name__ == '__main__':
     del filepaths[15]
 
     #TODO: ASSIGN LOADED MODEL, ORDER AND TARGET
-    modelname = 'models/2yaw500'
-    ORDER = 2
+    modelname = 'models/3yaw500'
+    ORDER = 3
     TARGET = 2
 
     # Load json and create model
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     mae = []
     avg_corr = []
     # Load validation data
-    for filepath in filepaths[:15]:
+    for filepath in filepaths[15:]:
         X_test, y_test = getdata(filepath, ORDER) # Last 4 for test
         y_test = y_test[:, TARGET]
  
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     plt.plot(y_pred, 'r',label='prediction')
     plt.plot(y_viz, 'b',label='ground truth')
     plt.legend(loc=4)
-    plt.savefig('images/2yaw500.png')   # TODO: ASSIGN PICTURE NAME
+    plt.savefig('images/3yaw500test.png')   # TODO: ASSIGN PICTURE NAME
     plt.show()
 
     # Visualize model
