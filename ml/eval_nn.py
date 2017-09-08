@@ -13,8 +13,8 @@ if __name__ == '__main__':
     del filepaths[15]
 
     #TODO: ASSIGN LOADED MODEL, ORDER AND TARGET
-    modelname = 'models/3yaw500'
-    ORDER = 3
+    modelname = 'models/0yaw500'
+    ORDER = 0
     TARGET = 2
 
     # Load json and create model
@@ -57,10 +57,10 @@ if __name__ == '__main__':
 
     # Visualize prediction
     y_pred = loaded_model.predict(X_viz)
-    plt.plot(y_pred, 'r',label='prediction')
-    plt.plot(y_viz, 'b',label='ground truth')
-    plt.legend(loc=4)
-    plt.savefig('images/3yaw500test.png')   # TODO: ASSIGN PICTURE NAME
+    plt.plot(y_viz,label='ground truth')
+    plt.plot(y_pred,label='prediction')
+    #plt.legend(loc=4)
+    plt.savefig('images/0yaw500test.png')   # TODO: ASSIGN PICTURE NAME
     plt.show()
 
     # Visualize model
